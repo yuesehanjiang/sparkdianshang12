@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+
+
+    <property>
+        <name>javax.jdo.option.ConnectionURL</name>
+        <value>jdbc:mysql://gz-cdb-eivmcin2.sql.tencentcdb.com:62539/metastore?createDatabaseIfNotExist=true</value>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionDriverName</name>
+        <value>com.mysql.jdbc.Driver</value>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionUserName</name>
+        <value>root</value>
+    </property>
+    <property>
+        <name>javax.jdo.option.ConnectionPassword</name>
+        <value>rrttcch123</value>
+    </property>
+
+    <!-- zookeeper 地址-->
+    <property>
+        <name>hive.zookeeper.quorum</name>
+        <value>had101,had102,had103</value>
+        <description>The list of ZooKeeper servers to talk to. This is only needed for read/write locks.</description>
+    </property>
+    <!-- zookeeper 端口号 -->
+    <property>
+        <name>hive.zookeeper.client.port</name>
+        <value>2181</value>
+        <description>The port of ZooKeeper servers to talk to. This is only needed for read/write locks.</description>
+    </property>
+
+
+
+    <property>
+        <name>hive.exec.scratchdir</name>
+        <value>hdfs://had101:9000/user/hive/tmp</value>
+    </property>
+    <property>
+        <name>hive.metastore.warehouse.dir</name>
+        <value>hdfs://had101:9000/user/hive/warehouse</value>
+    </property>
+    <property>
+        <name>hive.querylog.location</name>
+        <value>hdfs://had101:9000/user/hive/log</value>
+    </property>
+    <property>
+        <name>hive.metastore.uris</name>
+        <value>thrift://had101:9083</value>
+    </property>
+
+
+
+    <property>
+        <name>hive.metastore.schema.verification</name>
+        <value>false</value>
+        <description>
+            Enforce metastore schema version consistency.
+            True: Verify that version information stored in metastore matches with one from Hive jars.  Also disable automatic
+            schema migration attempt. Users are required to manully migrate schema after Hive upgrade which ensures
+            proper metastore schema migration. (Default)
+            False: Warn if the version information stored in metastore doesn't match with one from in Hive jars.
+        </description>
+    </property>
+
+</configuration>
