@@ -3,6 +3,8 @@
   */
 package com.atguigu.sparkmall.common.util
 
+import java.util
+
 import com.atguigu.sparkmall.common.bean.AdsInfo
 import com.atguigu.sparkmall.mock.util.ConfigurationUtil
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -10,14 +12,16 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
 import com.atguigu.sparkmall.common.util.MyKafkaUtil
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.streaming.dstream.{DStream, InputDStream}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
+import redis.clients.jedis.Jedis
 
 object MyKafkaUtil {
   val config = ConfigurationUtil("config.properties")
   val broker_list = config.getString("kafka.broker.list")
-
+  var jeds=new Jedis("127.0.0.1",6379)
   // kafka消费者配置
   val kafkaParam = Map(
     "bootstrap.servers" -> broker_list, //用于初始化链接到集群的地址
@@ -68,7 +72,49 @@ object MyKafkaUtil {
           AdsInfo(split(0).toLong, split(1), split(2), split(3), split(4))
       }
 
-      adsInfoDStream.print()
+
+      println(123)
+
+   //1 拦截数据
+      adsInfoDStream.transform(rdd => {
+        // 读出来黑名单
+        val blackList: util.Set[String] = jeds.smembers("hei")
+        val blackListBC: Broadcast[util.Set[String]] = sc.broadcast(blackList)
+        jeds.close()
+        rdd.filter(adsInfo => {
+          !blackListBC.value.contains(adsInfo.userid)
+        })
+      })
+println(234)
+//读取数据
+      adsInfoDStream.foreachRDD(rdd=>{
+       // println("rdd",rdd)
+        rdd.foreachPartition(x=>{//println("x",x)
+        x.foreach(y=>{//println("yyyy",y.area,y.city_name,y.dayString,y.userid)
+           val filed=s"${y.userid}:${y.dayString}:${y.adid}"
+            jeds.hincrBy(s"${y.userid}",filed,1)  //数据累加1
+            //如果点击大于100   就是黑名单
+            val str: String = jeds.hget(s"${y.userid}",filed)
+            if(str.toInt>=100){
+              jeds.sadd("hei",s"${y.userid}")
+            }
+          }
+          )
+        }
+        )
+      })
+
+
+
+
+
+
+      //读出黑名单
+
+
+
+
+
 
       ssc.start()
       ssc.awaitTermination()
