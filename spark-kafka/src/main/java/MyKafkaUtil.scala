@@ -61,7 +61,7 @@ object MyKafkaUtil {
       // 4. 得到 DStream
       val recordDStream: InputDStream[ConsumerRecord[String, String]] = MyKafkaUtil.getDStream(ssc, "tc")
 
-      // 5. 为了方便后面的计算, 把消费到的字符串封装到对象中
+      // 5. 为了方便后面的计算, 把消费到的字符串封装到对象中第三方第三方法
       val adsInfoDStream: DStream[AdsInfo] = recordDStream.map {
         record =>
           val split: Array[String] = record.value.split(",")
