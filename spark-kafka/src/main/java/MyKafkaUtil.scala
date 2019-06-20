@@ -36,6 +36,10 @@ object MyKafkaUtil {
     //如果是false，会需要手动维护kafka偏移量. 本次我们仍然自动维护偏移量
     "enable.auto.commit" -> (true: java.lang.Boolean)
   )
+
+
+
+
   /*
    创建DStream，返回接收到的输入数据
    LocationStrategies：根据给定的主题和集群地址创建consumer
@@ -51,6 +55,21 @@ object MyKafkaUtil {
       ConsumerStrategies.Subscribe[String, String](Array(topic), kafkaParam))
   }
 
+
+
+  // 过滤黑名单中的用户. 返回值是不包含黑名单的用户的广告点击记录的 DStream
+  def checkUserFromBlackList(adsClickInfoDStream: DStream[AdsInfo], sc: SparkContext): DStream[AdsInfo] = {
+    //1 拦截数据 过率数据
+         adsClickInfoDStream.transform(rdd => {
+      // 读出来黑名单
+      val blackList: util.Set[String] = jeds.smembers("hei")
+      val blackListBC: Broadcast[util.Set[String]] = sc.broadcast(blackList)
+      jeds.close()
+      rdd.filter(adsInfo => {
+        !blackListBC.value.equals(adsInfo.userid)
+      })
+    })
+  }
 
 
     def main(args: Array[String]): Unit = {
@@ -75,19 +94,10 @@ object MyKafkaUtil {
 
       println(123)
 
-   //1 拦截数据
-      adsInfoDStream.transform(rdd => {
-        // 读出来黑名单
-        val blackList: util.Set[String] = jeds.smembers("hei")
-        val blackListBC: Broadcast[util.Set[String]] = sc.broadcast(blackList)
-        jeds.close()
-        rdd.filter(adsInfo => {
-          !blackListBC.value.contains(adsInfo.userid)
-        })
-      })
-println(234)
+      val value: DStream[AdsInfo] = checkUserFromBlackList(adsInfoDStream: DStream[AdsInfo], sc: SparkContext)
+      println(234)
 //读取数据
-      adsInfoDStream.foreachRDD(rdd=>{
+      value.foreachRDD(rdd=>{
        // println("rdd",rdd)
         rdd.foreachPartition(x=>{//println("x",x)
         x.foreach(y=>{//println("yyyy",y.area,y.city_name,y.dayString,y.userid)
