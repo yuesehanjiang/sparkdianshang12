@@ -23,6 +23,6 @@
 </property>
 <property>
         <name>dfs.namenode.secondary.http-address</name>
-        <value>had103:50090</value>
+        <value>z103:50090</value>
     </property>
 </configuration>

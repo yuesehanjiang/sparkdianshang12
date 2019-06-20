@@ -20,12 +20,12 @@
 
 <property>
 <name>fs.defaultFS</name>
-        <value>hdfs://had101:9000</value>
+        <value>hdfs://z101:9000</value>
 </property>
 <!-- 指定hadoop运行时产生文件的存储目录 -->
 <property>
 <name>hadoop.tmp.dir</name>
-<value>/opt/module/cdh/hadoop-2.7.2/data/tmp</value>
+<value>/opt/module/hadoop-2.7.2/data/tmp</value>
 </property>
 
 

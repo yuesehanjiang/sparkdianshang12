@@ -239,14 +239,14 @@ object MockOffline {
   val productInfoData = mockProductInfo
   val cityInfoData = mockCityInfo
 
-    System.setProperty("hadoop.home.dir", "F:\\bigdataziliao\\hadoop\\hadoop-2.7.2")
+   // System.setProperty("hadoop.home.dir", "F:\\bigdataziliao\\hadoop\\hadoop-2.7.2")
 
     val spark: SparkSession = SparkSession
       .builder()
       .master("local[1]")
       .appName("MockOffline")
       .enableHiveSupport()
-      .config("spark.sql.warehouse.dir", "hdfs://had101:9000/user/hive/warehouse")
+      .config("spark.sql.warehouse.dir", "hdfs://z101:9000/user/hive/warehouse")
       .getOrCreate()
 
 
@@ -276,8 +276,8 @@ object MockOffline {
   def insertIntoHive(spark: SparkSession, tableName: String, df: DataFrame) = {
     val database = ConfigurationUtil("config.properties").getString("hive.database")
     spark.sql(s"use $database") // 切换数据库
-    spark.sql(s"drop table if exists $tableName") // 如果表已经存在, 则删除该表
-    df.write.saveAsTable(tableName) // 保存数据
+     spark.sql(s"drop table if exists $tableName") // 如果表已经存在, 则删除该表
+    df.write.saveAsTable(tableName)
         spark.sql(s"select * from $tableName").show(10000)
     println(s"$tableName 数据写入完毕!")
   }

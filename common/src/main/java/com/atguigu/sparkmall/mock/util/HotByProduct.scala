@@ -1,8 +1,8 @@
-package com.atguigu.sparkmall.offline.app
+package com.atguigu.sparkmall.mock.util
 
 import com.atguigu.sparkmall.common.bean.ClickByProduct
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.SparkSession
 
 /**
   * Created by qzy017 on 2019/6/17.
@@ -26,21 +26,26 @@ object HotByProduct {
 
   def main(args: Array[String]): Unit = {
 println(spark)
-var sql=    " \n\t   select t2.*\n\t     from (select  t1.*,   rank() over(partition by area ," +
-  " click_product_id  order by aa  desc) as ranks from haha  t1 ) t2 \n\n\t    where t2.ranks<=2"
+var sql=    "select count(uv.click_product_id) click_num ," +
+  "uv.click_product_id," +
+  "tpi.product_name,uv.city_id " +
+  "from sparkmall.user_visit_action uv " +
+  "left join sparkmall.product_info  pi on pi.product_id=uv.click_product_id" +
+  "left join sparkmall.city_info " +
+  " c on c.city_id=uv.city_id where uv.click_product_id !=-1 " +
+  "GROUP by uv.click_product_id,pi.product_name,uv.city_id order by uv.click_product_id desc"
+
     import spark.implicits._
-
-    spark.sql("use  sparkmall")
     val rdd: RDD[ClickByProduct] = spark.sql(sql).as[ClickByProduct].rdd
-   //点击数  商品ID     商品名字    城市
-    //ClickByProduct(4,华东,23,苏州,70,90)
-    //点击数   区域   city_iid   城市   商品ID    该商品的点击总数   小数 百分被
+
+
     rdd.foreach(println)
 
+ /*   aa:Long,area:String,city_id:Long,city_name:String,
+    click_product_id:Long,countall:Long*/
 
-println("================================================",rdd.count())
 
-    rdd.foreach(println)
+
 
 
 
