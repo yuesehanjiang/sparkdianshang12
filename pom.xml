@@ -11,6 +11,7 @@
         <module>common</module>
         <module>sparkmall-mock</module>
         <module>sparkmalloffline</module>
+        <module>spark-kafka</module>
     </modules>
     <packaging>pom</packaging>
 

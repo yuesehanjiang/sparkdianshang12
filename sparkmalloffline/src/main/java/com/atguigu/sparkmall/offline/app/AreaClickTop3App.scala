@@ -10,7 +10,20 @@ import com.atguigu.sparkmall.offline.acc.CityClickCountUDAF
 import org.apache.spark.sql.{SaveMode, SparkSession}
 
 object AreaClickTop3App {
-  def statAreaClickTop3Product(spark: SparkSession) = {
+  def statAreaClickTop3Product() = {
+
+    val spark: SparkSession = SparkSession
+      .builder()
+      .master("local[*]")
+      .appName("OfflineApp")
+      .enableHiveSupport()
+      .config("spark.sql.warehouse.dir", "hdfs://z101:9000/user/hive/warehouse")
+      .getOrCreate()
+
+
+
+
+
     // 注册 UDAF 函数
     spark.udf.register("city_remark", new CityClickCountUDAF)
     spark.sql("use sparkmall")
@@ -42,8 +55,22 @@ object AreaClickTop3App {
         |    rank() over(partition by t2.area sort by t2.click_count desc) rank
         |from t2
       """.stripMargin).createOrReplaceTempView("t3")
+
+
+    spark.sql("select * from t3").show()
+
+
+  }
+
+
+  def main(args: Array[String]): Unit = {
+    statAreaClickTop3Product
+
+  }
+}
+
     // 4. 只取前三名. 并把结果保存在数据库中
-    val conf = ConfigurationUtil("config.properties")
+    /*val conf = ConfigurationUtil("config.properties")
     val props = new Properties()
     props.setProperty("user", "root")
     props.setProperty("password", "aaa")
@@ -61,7 +88,7 @@ object AreaClickTop3App {
       .write.mode(SaveMode.Overwrite)
       .jdbc(conf.getString("jdbc.url"), "area_click_top10", props)
   }
-}
+}*/
 
 /*
 1. 查询出来所有的点击记录, 并与 city 变连接, 得到每个城市所在的地区
@@ -103,3 +130,6 @@ object AreaClickTop3App {
 6. 自定义聚合函数
 
  */
+
+
+

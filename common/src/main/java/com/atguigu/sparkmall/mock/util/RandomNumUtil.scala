@@ -67,7 +67,12 @@ object RandomNumUtil {
 
 
   def main(args: Array[String]): Unit = {
-    var haha=   randomInt(10,20)
-    println(haha)
+
+
+    for (i <-1 to 1000) {
+      val userid = RandomNumUtil.randomInt(1, 5)
+      println(userid)
+
+    }
   }
 }
