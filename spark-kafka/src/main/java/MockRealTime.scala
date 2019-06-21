@@ -105,10 +105,10 @@ object MockRealTime {
       mockRealTimeData().foreach {
         msg => {
           producer.send(new ProducerRecord(topic, msg))
-          Thread.sleep(100)
+          Thread.sleep(1000)
         }
       }
-      Thread.sleep(1000)
+      Thread.sleep(10000)
     }
   }
 }

@@ -22,6 +22,7 @@ object MyKafkaUtil {
   val config = ConfigurationUtil("config.properties")
   val broker_list = config.getString("kafka.broker.list")
   var jeds=new Jedis("127.0.0.1",6379)
+  jeds.select(9)
   // kafka消费者配置
   val kafkaParam = Map(
     "bootstrap.servers" -> broker_list, //用于初始化链接到集群的地址
